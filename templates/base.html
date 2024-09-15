@@ -1,0 +1,23 @@
+{% include "base-prebody.html" %}
+
+<header class="site-header">
+  <img class="logo" src="/secresoft.png" alt="Logo" />
+  <h1>Secresoft</h1>
+</header>
+
+<nav hx-boost="true">
+  <a {% if home %}class="current"{% endif %} href="/">Home</a>
+  <a {% if solutions %}class="current"{% endif %}href="/solutions">Solutions</a>
+  <a {% if our-work %}class="current"{% endif %}href="/our-work">Our Work</a>
+  <a {% if about-us %}class="current"{% endif %}href="/about-us">About Us</a>
+</nav>
+
+<div hx-boost="true">
+  {% block content %}{% endblock %}
+</div>
+
+<footer>
+  &copy; Secresoft (sehk-reh-soft). All rights reserved.
+</footer>
+
+{% include "base-postbody.html" %}
