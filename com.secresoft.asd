@@ -20,25 +20,30 @@
                ;; HTML Template
                "djula"
                ;; Because djula isn't good enough by itself:
-               "spinneret"
+               ;"spinneret"
                ;; DB
-               "cl-dbi"
-               "dbd-mysql"
+               ;"cl-dbi"
+               ;"dbd-mysql" ; note: requires https://dev.mysql.com/downloads/c-api/
+               ;            ; libmysqlclient to be found on system.
+               ;            ; (default-libmysqlclient-dev on debian, dev-db/mysql-connector-c on gentoo)
 
-               "ironclad" ; sha256
+               ; sha256
+               "ironclad"
 
                ;; Metrics
-               #:prometheus
-               #:prometheus.formats.text
-               #:prometheus.exposers.hunchentoot
-               #:prometheus.collectors.process
-               #:prometheus.collectors.sbcl
+               "prometheus"
+               "prometheus.formats.text"
+               "prometheus.exposers.hunchentoot"
+               "cffi-grovel"
+               "prometheus.collectors.process" ; note: requires cffi-grovel,
+                                               ; which requires a c compiler (build-essential on debian)
+               "prometheus.collectors.sbcl"
                )
 
   :components ((:module "src/"
                 :serial t
                 :components ((:file "config")
-                             (:file "view")
+                             (:file "metrics")
                              (:file "web")
                              (:file "main")
                              ))))

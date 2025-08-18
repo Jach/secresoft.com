@@ -10,11 +10,12 @@
            #:config
 
            #:acceptor
+           #:metrics-exposer-acceptor
            ))
 (in-package :com.secresoft.config)
 
 (defun local-dev? ()
-  (equal "gondolin" (uiop:hostname)))
+  (not (find :com.secresoft.binary-built *features*)))
 
 (defun app-root ()
   "Application root. On local systems, should be
@@ -35,28 +36,16 @@
   "Content is linked by its own self-referential sha256 hash instead of its filename."
   (merge-pathnames #p"ref/" (app-root)))
 
-(defparameter *common-config*
-  (list :error-log #p"/var/log/com.secresoft.hunchentoot.error.log"
-        :server-port 5312
-        :metrics-port 9101
-        :access-log #p"/var/log/com.secresoft.hunchentoot.access.log"
-        ))
+(defparameter *common-config* (uiop:read-file-form (merge-pathnames #p"environment.conf" (app-root))))
 
 (defun config (&optional key)
   "Other static app config"
   (getf *common-config* key))
 
 (defclass acceptor (easy-routes:easy-routes-acceptor easy-routes::easy-routes-errors-acceptor)
-    ((exposer :initarg :exposer :reader metrics-exposer)))
-
-(defclass exposer-acceptor (prometheus.hunchentoot:exposer hunchentoot:acceptor)
   ())
-;; Add to prometheus.yml:
-;;
-;;  - job_name: 'sbcl'
-;;    static_configs:
-;;    - targets: ['localhost:9101']
-;;
-;; Setup grafana on port 3000 with the example dashboard and check it out!
-;; See results of (sb-ext:gc)
+
+(defclass metrics-exposer-acceptor (prometheus.hunchentoot:exposer hunchentoot:acceptor)
+  ())
+
 

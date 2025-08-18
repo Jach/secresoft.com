@@ -1,39 +1,27 @@
 (defpackage #:com.secresoft
   (:use #:cl)
-  (:local-nicknames (#:config #:com.secresoft.config))
+  (:local-nicknames (#:config #:com.secresoft.config)
+                    (#:metrics #:com.secresoft.metrics))
   (:export #:main
            #:start
-           #:stop))
-(in-package :com.secresoft)
+           #:stop)
+  (:documentation
+    "This package provides top level functions to start and stop the web server and any associated services,
+     along with a main entry point to start for built binaries.
 
-(defvar *server* nil)
-(defvar *metrics-registry* nil)
+     The core logic around creating a hunchentoot acceptor and starting it is handled in com.secresoft.web."))
+
+(in-package :com.secresoft)
 
 (defun start (port)
   (format t "Starting with port ~a and app-root ~a~%" port (config:app-root))
-
-  (com.secresoft.view:setup)
-
-  (setf *server* (make-instance 'config:acceptor
-                                :port port
-                                :name 'secresoft
-                                :access-log-destination (config:config :access-log)))
-
-  (push (hunchentoot:create-folder-dispatcher-and-handler "/" (config:static-dir))
-        hunchentoot:*dispatch-table*)
-
-  (if (config:local-dev?)
-      (setf hunchentoot:*catch-errors-p* nil) ; catch in repl
-      (setf hunchentoot:*catch-errors-p* t))
-
-  (hunchentoot:start *server*))
+  (com.secresoft.web:start port))
 
 (defun stop ()
-  (setf hunchentoot:*dispatch-table* nil)
-  (hunchentoot:stop *server*)
-  (setf *server* nil))
+  (format t "~%Stopping~%")
+  (com.secresoft.web:stop))
 
-;;;; binary build main and exit points
+;;;; Binary build main and exit points
 
 (defun exit-cleanly ()
   (stop)
@@ -52,4 +40,4 @@
                             (sb-sys:interactive-interrupt (exit-cleanly))
                             (t (exit-with-backtrace c))))))
     (start (config:config :server-port))
-    (loop (sleep 1))))
+    (loop do (sleep most-positive-fixnum))))
