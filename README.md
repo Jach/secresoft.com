@@ -256,3 +256,10 @@ metrics I have panels for though are:
 * Total request rate
 
 The SBCL dynamic memory and breakdown, threads & cpu, and file descriptors are mildly interesting to have too. Make sure to change the units on the memory ones.
+
+There's some commentary in src/metrics.lisp. You may find it more valuable to look at https://gist.github.com/Jach/a79159518da5b1eebc1de788505d2dcd though. It's
+a short demonstration from a REPL context of how to use prometheus metrics.
+
+In this project I took the stance of having my requests counter and durations metrics be "total", i.e. for the lifetime of the server. There's an argument to be
+made that it can also be useful sometimes to have them "reset" after each metric sample in the time series, so most of the time they'll be 0 unless you get some
+requests over a sampling period.
